@@ -2,11 +2,7 @@
 require_once('db.php');
 
 /**
- * A demo program showing how to generate an HTML document from data stored
- * in a PDO/MySQL database
- *
- * @author  Rune Hjelsvold
- * @version 1.1
+ *Genererer en HTML dokument ifra data i PDO databasen
  */
 $db = openDB();
 $bloggList = getBloggList($db);
@@ -21,9 +17,11 @@ header('Content-type: text/html; charset=utf-8');
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 <title>Blogg</title>
 </head>
-<body>
+<body bgcolor="#F57FDA">
+<img src="katter.jpg">
 <h1>Publiserte innlegg</h1>
 <p>
+
 
 <!-- Call php script for printing BLOGG statistics -->
 <?php
@@ -31,30 +29,21 @@ echo $statistics;
 ?>
 
 </p>
-<table>
-<thead>
-<tr>
-<th>Tittel</th><th>Innhold</th><th>forfatternavn</th><th>publisert</th>
-</tr>
-</thead>
-<tbody>
-
+<p>legge innlegg inn i bloggen: <a href='BloggAddForm.php'>Klikk her</a><p>
 <!-- Call php script for printing information about individual CDs -->
 <?php
 foreach($bloggList as $blogg) {
-    echo  "<tr>\n"
-        . "<td>" . htmlspecialchars($blogg['Tittel']) . "</td>"
-        . "<td>" . htmlspecialchars($blogg['Innhold']) . "</td>"
-        . "<td>" . htmlspecialchars($blogg['ForfatterNavn']) . "</td>"
-        . "<td>" . htmlspecialchars($blogg['ForfatterEpost']) . "</td>"
-        . "<td>" . htmlspecialchars($blogg['puBtime']) . "</td>\n"
-        . "</tr>\n";
+    echo  "<p>\n"
+        . "<p><h1>" . htmlspecialchars($blogg['Tittel']) . "</p></h1>"
+		. "<p><em>" . htmlspecialchars($blogg['ForfatterNavn']).'(' . htmlspecialchars($blogg['ForfatterEpost']) . ')'
+		. "</em></p>"
+        . "<p>" . htmlspecialchars($blogg['Innhold']) . "</p>"
+        . "<p>" . htmlspecialchars($blogg['puBtime']) . "</p>\n"
+        . "</p>\n";
 
 }
 ?>
 
-</tbody>
-</table>
 </body>
 </html>
 
@@ -69,7 +58,8 @@ foreach($bloggList as $blogg) {
  */
 function getBloggList($db)
 {
-    $stmt = $db->prepare("SELECT Tittel, Innhold, ForfatterNavn, ForfatterEpost, puBtime FROM oblig1");
+    $stmt = $db->prepare("SELECT Tittel, Innhold, ForfatterNavn, ForfatterEpost, puBtime FROM oblig1 ORDER BY PuBtime DESC");
+	
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

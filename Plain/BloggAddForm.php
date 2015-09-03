@@ -27,13 +27,13 @@ require_once('db.php');
 if (count($_POST) > 0) {
     // The user has completed the form and here comes the entered data
     // Replace empty strings with null for proper database handling
-    $title = formatInput($_POST['title']);
-    $innhold = formatInput($_POST['innhold']);
-    $forfatterNavn = formatInput($_POST['forfatterNavn']);
-    $forfatterEpost = formatInput($_POST['forfatterEpost']);
+    $Tittel = formatInput($_POST['tittel']);
+    $Innhold = formatInput($_POST['innhold']);
+    $ForfatterNavn = formatInput($_POST['forfatterNavn']);
+    $ForfatterEpost = formatInput($_POST['forfatterEpost']);
 
     $db = openDB();
-    if (addBlogg($db, $title, $innhold, $forfatterNavn, $forfatterEpost) > 0) {
+    if (addBlogg($db, $Tittel, $Innhold, $ForfatterNavn, $ForfatterEpost) > 0) {
 	    // Information about the new CD was successfully added 
 	    // Redirect the response to the page displaying the library
         header('Location: BloggLibrary.php');
@@ -54,6 +54,8 @@ if (count($_POST) > 0) {
 <title>Opprette nytt innlegg</title>
 <body>
 <h1>Opprette nytt innlegg</h1>
+<p> Gå tilbake til bloggen: <a href='BloggLibrary.php'>Klikk her</a>
+</p>
 HTML;
 
     // Print the error message if one has been passed to the script
@@ -64,8 +66,8 @@ HTML;
     // Print the form itself
     echo <<<HTML
 <form action='BloggAddForm.php' method='post'>
-Tittel: <input type='text' name='title' size='32'><br>
-Innhold: <input type='text' name='innhold' size='32'><br>
+Tittel: <input type='text' name='tittel' size='32'><br>
+Innhold: <br><textarea rows='8' cols='50' name='innhold'></textarea><br>
 ForfatterNavn: <input type='text' name='forfatterNavn' size='32'><br>
 ForfatterEpost: <input type='text' name='forfatterEpost' size='32'><br>
 <input type='submit'>
@@ -87,23 +89,21 @@ HTML;
  * @return integer The auto-generated id of the newly create cd if the database
  *         was successfully updated
  */
-function addBlogg($db, $title, $artist, $genre, $year)
+function addBlogg($db, $Tittel, $Innhold, $ForfatterNavn, $ForfatterEpost)
 {
-    $res = 0;
+    $res = 0;	
     try {
-        $stmt = $db->prepare("INSERT INTO oblig1 "
-              . "(title, innhold, ForfatterNavn,ForfatterEpost, pubTime) "
-              . "VALUES(:title, :innhold, :forfatterNavn, :forfatterEpost, :pubTime)");
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':artist', $innhold);
-        $stmt->bindParam(':genre', $forfatterNavn);
-		$stmt->bindParam(':genre', $forfatterEpost);
-        $stmt->bindParam(':year', $pubTime); //, PDO::PARAM_INT)
-        $stmt->execute();
+        $stmt = $db->prepare("INSERT INTO oblig1 ( Tittel, Innhold, ForfatterNavn, ForfatterEpost)
+		VALUES (:tittel ,:innhold,:forfatterNavn ,:forfatterEpost);");	  
+		$stmt->bindParam(':tittel', $Tittel);
+        $stmt->bindParam(':innhold', $Innhold);
+        $stmt->bindParam(':forfatterNavn', $ForfatterNavn);
+		$stmt->bindParam(':forfatterEpost', $ForfatterEpost);
+        $stmt->execute();	
 
         $res = $db->lastInsertId();
-    } catch (Exception $e) {
-    }
+    } catch (Exception $e) { echo $e->getMessage();
+   }
     return $res;
 }
 
